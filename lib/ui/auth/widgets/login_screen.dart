@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, required this.title});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key, required this.title});
 
   final String title;
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,39 +23,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Stack(
-                children: [
-                  ClipOval(
-                    child: Image.asset(
-                      "lib/assets/images/img_cloth.jpeg",
-                      width: 100,
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 50,
-
-                    child: CustomPaint(
-                      size: Size(100, 50),
-                      painter: _HalfCirclePainter(),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 38,
-
-                    child: Row(
-                      children: [
-                        Text(
-                          "Edit",
-                          style: TextTheme.of(
-                            context,
-                          ).labelSmall?.copyWith(color: Colors.white),
-                        ),
-                        Icon(Icons.edit, size: 12, color: Colors.white),
-                      ],
-                    ),
-                  ),
-                ],
+              Text(
+                "Tezda",
+                style: TextTheme.of(
+                  context,
+                ).headlineMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              SizedBox(height: 16),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  "Welcome to the world's number one leading\n e-commerce hub 🎉🥳",
+                  style: TextTheme.of(context).labelMedium,
+                  textAlign: TextAlign.center,
+                ),
               ),
               SizedBox(height: 24),
               Column(
@@ -63,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Name",
+                      "Email",
                       style: TextTheme.of(context).labelSmall,
                     ),
                   ),
@@ -72,8 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextTheme.of(context).bodyMedium,
                     cursorColor: Colors.purple.withAlpha(100),
                     decoration: InputDecoration(
-                      icon: Icon(Icons.person, color: Colors.black),
-                      hintText: "Tap to edit name",
+                      icon: Icon(Icons.email, color: Colors.black),
+                      hintText: "Enter your email",
                       hintStyle: TextTheme.of(
                         context,
                       ).labelSmall?.copyWith(fontWeight: FontWeight.normal),
@@ -99,17 +80,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Email",
+                      "Password",
                       style: TextTheme.of(context).labelSmall,
                     ),
                   ),
                   TextField(
+                    obscureText: true,
                     onSubmitted: (text) {},
                     style: TextTheme.of(context).bodyMedium,
                     cursorColor: Colors.purple.withAlpha(100),
                     decoration: InputDecoration(
-                      icon: Icon(Icons.email, color: Colors.black),
-                      hintText: "Tap to edit email",
+                      icon: Icon(Icons.lock, color: Colors.black),
+                      hintText: "Enter your password",
                       hintStyle: TextTheme.of(
                         context,
                       ).labelSmall?.copyWith(fontWeight: FontWeight.normal),
@@ -140,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   child: Text(
-                    "Save 🔐",
+                    "Login or Register 🚀",
                     style: TextTheme.of(
                       context,
                     ).labelMedium?.copyWith(color: Colors.white),
