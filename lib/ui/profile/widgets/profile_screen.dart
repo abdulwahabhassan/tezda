@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.title});
@@ -10,6 +11,33 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  static const platform = MethodChannel('device_info');
+
+  String deviceModel = "X10";
+  String systemVersion = "ios 16";
+  String deviceName = "Iphone";
+
+  Future<void> _getDeviceInfo() async {
+    try {
+      final Map<dynamic, dynamic> deviceInfo = await platform.invokeMethod(
+        'getDeviceInfo',
+      );
+      setState(() {
+        deviceModel = deviceInfo['model'] ?? "Unknown";
+        systemVersion = deviceInfo['systemVersion'] ?? "Unknown";
+        deviceName = deviceInfo['name'] ?? "Unknown";
+      });
+    } on PlatformException catch (e) {
+      print("Failed to get device info: '${e.message}'.");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getDeviceInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +61,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Positioned(
                     bottom: 50,
-
                     child: CustomPaint(
                       size: Size(100, 50),
                       painter: _HalfCirclePainter(),
@@ -55,6 +82,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
+                ],
+              ),
+              SizedBox(height: 24),
+              Column(
+                children: [
+                  Text("Device Model", style: TextTheme.of(context).labelSmall),
+                  Text(deviceModel, style: TextTheme.of(context).bodySmall),
+                  SizedBox(height: 4),
+                  Text(
+                    "System Version",
+                    style: TextTheme.of(context).labelSmall,
+                  ),
+                  Text(systemVersion, style: TextTheme.of(context).bodySmall),
+                  SizedBox(height: 4),
+                  Text("Device Name", style: TextTheme.of(context).labelSmall),
+                  Text(deviceName, style: TextTheme.of(context).bodySmall),
                 ],
               ),
               SizedBox(height: 24),
