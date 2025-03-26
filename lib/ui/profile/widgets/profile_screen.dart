@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.title});
@@ -16,9 +17,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   static const platform = MethodChannel('device_info');
+
   String deviceModel = "";
   String systemVersion = "";
   String deviceName = "";
+  String name = "";
+  String email = "";
 
   Future<void> getDeviceInfo() async {
     try {
@@ -62,15 +66,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> saveProfile(String name, String email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name_key', name);
+    await prefs.setString('email_key', email);
+  }
+
+  Future<void> loadProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString('name_key') ?? "";
+      email = prefs.getString('email_key') ?? "";
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getDeviceInfo();
     loadImage();
+    loadProfile();
   }
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController nameController = TextEditingController(text: name);
+    TextEditingController emailController = TextEditingController(text: email);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -155,6 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   TextField(
+                    controller: nameController,
                     onSubmitted: (text) {},
                     style: TextTheme.of(context).bodyMedium,
                     cursorColor: Colors.purple.withAlpha(100),
@@ -191,6 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   TextField(
+                    controller: emailController,
                     onSubmitted: (text) {},
                     style: TextTheme.of(context).bodyMedium,
                     cursorColor: Colors.purple.withAlpha(100),
@@ -220,7 +244,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    saveProfile(nameController.text, emailController.text);
+                  },
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
