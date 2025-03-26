@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tezda/ui/auth/widgets/login_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const TezdaApp());
+  runApp(const ProviderScope(child: TezdaApp()));
 }
 
 class TezdaApp extends StatelessWidget {
@@ -19,4 +20,6 @@ class TezdaApp extends StatelessWidget {
     );
   }
 }
+
+
 
