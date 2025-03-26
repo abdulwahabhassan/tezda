@@ -7,6 +7,7 @@ import 'package:tezda/ui/profile/widgets/profile_screen.dart';
 import '../../../data/models/product.dart';
 import '../../../domain/models/status.dart';
 import '../../../network/service.dart';
+import '../../../utils/helpers.dart';
 
 part 'product_list_screen.g.dart';
 
@@ -94,16 +95,16 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
-            final category = categories[index];
+            final product = categories[index];
             return _ProductListGridItem(
-              product: category,
+              product: product,
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder:
                         (buildContext) =>
-                            ProductDetailsScreen(title: "${category.id}"),
+                            ProductDetailsScreen(product: product),
                   ),
                 );
               },
@@ -219,7 +220,7 @@ class _ProductListGridItem extends StatelessWidget {
                           Container(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "\$${product.price}",
+                              formatCurrency(product.price ?? 0.00),
                               textAlign: TextAlign.left,
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(fontWeight: FontWeight.bold),
