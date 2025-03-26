@@ -146,6 +146,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ],
               ),
             ),
+            SizedBox(height: 12),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                "Reviews",
+                style: TextTheme.of(
+                  context,
+                ).bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+              ),
+            ),
             if (widget.product.reviews != null &&
                 widget.product.reviews!.isNotEmpty)
               SizedBox(
