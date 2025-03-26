@@ -7,21 +7,21 @@ import '../../core/ui/error_dialog.dart';
 
 part 'login_screen.g.dart';
 
-final counterProvider = StateProvider((ref) => 0);
 
 @riverpod
 class LoginNotifier extends _$LoginNotifier {
   @override
-  Status build() => Status.idle;
+  Status build() => Idle();
 
   Future<void> login(String email, String password) async {
-    state = Status.loading;
+    state = Loading();
     await Future.delayed(Duration(seconds: 2));
-    if (email == "test@example.com" && password == "password123") {
-      state = Status.success;
-    } else {
-      state = Status.error;
-    }
+    state = Success(null);
+    // if (email == "test@example.com" && password == "password123") {
+    //   state = Success(null);
+    // } else {
+    //   state = Error("Error logging in");
+    // }
   }
 }
 
@@ -44,15 +44,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final loginStatus = ref.watch(loginNotifierProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (loginStatus == Status.error) {
-        showErrorDialog(context, "Invalid email or password");
-      } else if (loginStatus == Status.success) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (buildContext) => ProductListScreen(title: "Products"),
-          ),
-        );
+      switch (loginStatus) {
+        case Idle():
+          break;
+        case Success():
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (buildContext) => ProductListScreen(title: "Products"),
+            ),
+          );
+        case Loading():
+          break;
+        case Error(:var message):
+          showErrorDialog(context, message);
       }
     });
 
@@ -157,7 +162,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
               ),
               SizedBox(height: 48),
-              loginStatus == Status.loading
+              loginStatus is Loading
                   ? CircularProgressIndicator()
                   : SizedBox(
                     width: double.infinity,
