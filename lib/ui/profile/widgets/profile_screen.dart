@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.title});
@@ -12,12 +16,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   static const platform = MethodChannel('device_info');
+  String deviceModel = "";
+  String systemVersion = "";
+  String deviceName = "";
 
-  String deviceModel = "X10";
-  String systemVersion = "ios 16";
-  String deviceName = "Iphone";
-
-  Future<void> _getDeviceInfo() async {
+  Future<void> getDeviceInfo() async {
     try {
       final Map<dynamic, dynamic> deviceInfo = await platform.invokeMethod(
         'getDeviceInfo',
@@ -32,10 +35,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  File? image;
+  final ImagePicker picker = ImagePicker();
+
+  Future<void> pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final directory = await getApplicationDocumentsDirectory();
+      final imagePath = '${directory.path}/profile_image.png';
+      final savedImage = await File(pickedFile.path).copy(imagePath);
+      setState(() {
+        image = savedImage;
+      });
+    }
+  }
+
+  Future<void> loadImage() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagePath = '${directory.path}/profile_image.png';
+
+    if (File(imagePath).existsSync()) {
+      setState(() {
+        image = File(imagePath);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _getDeviceInfo();
+    getDeviceInfo();
+    loadImage();
   }
 
   @override
@@ -51,38 +82,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Stack(
-                children: [
-                  ClipOval(
-                    child: Image.asset(
-                      "lib/assets/images/img_cloth.jpeg",
-                      width: 100,
+              GestureDetector(
+                onTap: pickImage,
+                child: Stack(
+                  children: [
+                    ClipOval(
+                      child:
+                          image != null
+                              ? Image.file(
+                                image!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              )
+                              : Image.asset(
+                                "lib/assets/images/img_cloth.jpeg",
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: 50,
-                    child: CustomPaint(
-                      size: Size(100, 50),
-                      painter: _HalfCirclePainter(),
+                    Positioned(
+                      bottom: 50,
+                      child: CustomPaint(
+                        size: Size(100, 50),
+                        painter: _HalfCirclePainter(),
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 38,
+                    Positioned(
+                      bottom: 0,
+                      left: 38,
 
-                    child: Row(
-                      children: [
-                        Text(
-                          "Edit",
-                          style: TextTheme.of(
-                            context,
-                          ).labelSmall?.copyWith(color: Colors.white),
-                        ),
-                        Icon(Icons.edit, size: 12, color: Colors.white),
-                      ],
+                      child: Row(
+                        children: [
+                          Text(
+                            "Edit",
+                            style: TextTheme.of(
+                              context,
+                            ).labelSmall?.copyWith(color: Colors.white),
+                          ),
+                          Icon(Icons.edit, size: 12, color: Colors.white),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               SizedBox(height: 24),
               Column(

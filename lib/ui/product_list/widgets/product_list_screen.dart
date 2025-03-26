@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tezda/ui/product_details/widgets/product_details_screen.dart';
 import 'package:tezda/ui/product_list/widgets/star_rating.dart';
@@ -38,12 +41,27 @@ class ProductListScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductListScreenState extends ConsumerState<ProductListScreen> {
+
+  File? image;
+
+  Future<void> loadImage() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagePath = '${directory.path}/profile_image.png';
+
+    if (File(imagePath).existsSync()) {
+      setState(() {
+        image = File(imagePath);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     Future.microtask(
-      () => ref.read(productsNotifierProvider.notifier).getProducts(),
+          () => ref.read(productsNotifierProvider.notifier).getProducts(),
     );
+    loadImage();
   }
 
   @override
@@ -61,10 +79,16 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme
+            .of(context)
+            .colorScheme
+            .inversePrimary,
         title: Text(
           widget.title,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme
+              .of(context)
+              .textTheme
+              .titleMedium,
         ),
         actions: [
           IconButton(
@@ -77,7 +101,17 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
               );
             },
             icon: ClipOval(
-              child: Image.asset("lib/assets/images/img_cloth.jpeg"),
+                child: image != null ? Image.file(
+                  image!,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                ) : Image.asset(
+                  "lib/assets/images/img_cloth.jpeg",
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                ),
             ),
           ),
         ],
@@ -85,62 +119,70 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
       body: switch (productsStatus) {
         Idle() => const Center(child: Text("No categories available")),
         Loading() => const Center(child: CircularProgressIndicator()),
-        Success() => GridView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 0.65,
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final product = categories[index];
-            return _ProductListGridItem(
-              product: product,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (buildContext) =>
+        Success() =>
+            GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 0.65,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final product = categories[index];
+                return _ProductListGridItem(
+                  product: product,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (buildContext) =>
                             ProductDetailsScreen(product: product),
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-        ),
-        Error(:var message) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  message,
-                  style: TextTheme.of(context).bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: productsNotifier.getProducts,
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            ),
+        Error(:var message) =>
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Text(
+                      message,
+                      style: TextTheme
+                          .of(context)
+                          .bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-                child: Text(
-                  "Try Again 🥺",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelMedium?.copyWith(color: Colors.white),
-                ),
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: productsNotifier.getProducts,
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      "Try Again 🥺",
+                      style: Theme
+                          .of(
+                        context,
+                      )
+                          .textTheme
+                          .labelMedium
+                          ?.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       },
     );
   }
@@ -196,9 +238,12 @@ class _ProductListGridItem extends StatelessWidget {
                           ),
                           child: Text(
                             "${product.discountPercentage?.round()}% ↓",
-                            style: TextTheme.of(
+                            style: TextTheme
+                                .of(
                               context,
-                            ).labelSmall?.copyWith(color: Colors.black),
+                            )
+                                .labelSmall
+                                ?.copyWith(color: Colors.black),
                           ),
                         ),
                     ],
@@ -222,7 +267,10 @@ class _ProductListGridItem extends StatelessWidget {
                             child: Text(
                               formatCurrency(product.price ?? 0.00),
                               textAlign: TextAlign.left,
-                              style: Theme.of(context).textTheme.bodyMedium
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .bodyMedium
                                   ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -241,7 +289,10 @@ class _ProductListGridItem extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               product.title ?? "No title",
                               textAlign: TextAlign.left,
-                              style: Theme.of(context).textTheme.bodySmall,
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .bodySmall,
                             ),
                           ),
                           Flexible(

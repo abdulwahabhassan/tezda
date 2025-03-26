@@ -17,11 +17,6 @@ class LoginNotifier extends _$LoginNotifier {
     state = Loading();
     await Future.delayed(Duration(seconds: 2));
     state = Success(null);
-    // if (email == "test@example.com" && password == "password123") {
-    //   state = Success(null);
-    // } else {
-    //   state = Error("Error logging in");
-    // }
   }
 }
 
@@ -48,7 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         case Idle():
           break;
         case Success():
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (buildContext) => ProductListScreen(title: "Products"),
